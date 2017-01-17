@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1033749756297",
+    "firebase_url": "https://fir-service-c6c56.firebaseio.com",
+    "project_id": "fir-service-c6c56",
+    "storage_bucket": "fir-service-c6c56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033749756297:android:5efe0716c22ad451",
+        "android_client_info": {
+          "package_name": "com.example.kamranali.geofencedummyproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033749756297-d6ek71nsl6htoavep9114vr1o6ig2bso.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwZgELo6HiEm9VG4i7cgGlyh1LZIsI5oU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
