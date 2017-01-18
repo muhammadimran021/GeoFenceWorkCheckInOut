@@ -73,8 +73,8 @@ public class GeoFenceTransitionIntentService extends IntentService {
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 //Getting List of the geofences that triggered this geofence transition alert
-
-                if(!isExit) {
+                sendNotification("Enter Detected");
+                if (!isExit) {
                     List<Geofence> triggerdGeoFencesList = geofencingEvent.getTriggeringGeofences();
 
                     //Getting the location that triggered the geofence transition.
@@ -96,16 +96,18 @@ public class GeoFenceTransitionIntentService extends IntentService {
                     value.put("server-Time", ServerValue.TIMESTAMP);
 
                     firebaseDatabase.child("Kamran").push().setValue(value);
+                } else {
+                    isExit = false;
                 }
             } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-
+                sendNotification("Exit Detected");
                 isExit = true;
                 handler.postDelayed(new Runnable() {
 
                     @Override
                     public void run() {
                         geofenceTransition = 0;
-                        if(isExit) {
+                        if (isExit) {
                             int geofenceTransitions = geofencingEvent.getGeofenceTransition();
                             if (geofenceTransitions == Geofence.GEOFENCE_TRANSITION_ENTER) {
                                 Toast.makeText(GeoFenceTransitionIntentService.this, "u r enter again in office", Toast.LENGTH_SHORT).show();
@@ -137,6 +139,7 @@ public class GeoFenceTransitionIntentService extends IntentService {
                                 firebaseDatabase.child("Kamran").push().setValue(value);
 
                             }
+                            isExit = true;
                         }
                     }
                 }, 1000 * 2 * 60);

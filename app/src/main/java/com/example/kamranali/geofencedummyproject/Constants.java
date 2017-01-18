@@ -33,7 +33,7 @@ public class Constants  {
             GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
     //public static final float GEOFENCE_RADIUS_IN_METERS = 1609; // 1 mile, 1.6 km
 
-    public static final float GEOFENCE_RADIUS_IN_METERS = 60; // 1 mile, 1.6 km
+    public static final float GEOFENCE_RADIUS_IN_METERS = 50; // 1 mile, 1.6 km
 
     public static final HashMap<String, LatLng> PanacloudLatLong = new HashMap<String, LatLng>();
     static {
