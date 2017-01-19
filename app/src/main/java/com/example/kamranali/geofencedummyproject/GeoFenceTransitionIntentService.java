@@ -7,10 +7,12 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
@@ -38,14 +40,19 @@ import java.util.Map;
 public class GeoFenceTransitionIntentService extends IntentService {
     DatabaseReference firebaseDatabase;
     Handler handler = new Handler();
-    boolean isExit;
-
+    boolean isExit = false;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
     int geofenceTransition;
 
 
     @Override
     public void onCreate() {
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPreferences.edit();
+
+
         super.onCreate();
     }
 
@@ -57,6 +64,7 @@ public class GeoFenceTransitionIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
         //Getting Data form Intent
         final GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
 
@@ -72,15 +80,12 @@ public class GeoFenceTransitionIntentService extends IntentService {
         //Checking geofenceTranstion type
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-                //Getting List of the geofences that triggered this geofence transition alert
                 sendNotification("Enter Detected");
-                if (!isExit) {
+                if (!sharedPreferences.getBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false)) {
                     List<Geofence> triggerdGeoFencesList = geofencingEvent.getTriggeringGeofences();
-
                     //Getting the location that triggered the geofence transition.
                     String geofenceTransitionDetails = getGeofenceTransitionDetails(this, geofenceTransition, triggerdGeoFencesList);
                     sendNotification(geofenceTransitionDetails);
-                    Log.d(TAG, geofenceTransitionDetails);
                     Date date = new Date(System.currentTimeMillis());
                     SimpleDateFormat format = new SimpleDateFormat("EEE, MMM d, ''yy , hh:mm:ss", Locale.ENGLISH);
                     String st_date = format.format(date);
@@ -96,32 +101,35 @@ public class GeoFenceTransitionIntentService extends IntentService {
                     value.put("server-Time", ServerValue.TIMESTAMP);
 
                     firebaseDatabase.child("Kamran").push().setValue(value);
+                    Log.d(TAG, geofenceTransitionDetails);
                 } else {
-                    isExit = false;
+                    editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false);
+                    editor.commit();
+//                    isExit = false;
                 }
+
+
             } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
                 sendNotification("Exit Detected");
-                isExit = true;
+                editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, true);
+                editor.commit();
+
+
                 handler.postDelayed(new Runnable() {
 
                     @Override
                     public void run() {
-                        geofenceTransition = 0;
-                        if (isExit) {
-                            int geofenceTransitions = geofencingEvent.getGeofenceTransition();
-                            if (geofenceTransitions == Geofence.GEOFENCE_TRANSITION_ENTER) {
-                                Toast.makeText(GeoFenceTransitionIntentService.this, "u r enter again in office", Toast.LENGTH_SHORT).show();
-                            } else if (geofenceTransitions == Geofence.GEOFENCE_TRANSITION_EXIT) {
-
+                        Log.d("TAG", "isExit: " + isExit);
+                        if (sharedPreferences.getBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false)) {
+                            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
                                 Log.d("EXIT", "You are exit");
                                 Toast.makeText(GeoFenceTransitionIntentService.this, "u r exit", Toast.LENGTH_SHORT).show();
                                 List<Geofence> triggerdGeoFencesList = geofencingEvent.getTriggeringGeofences();
 
                                 //Getting the location that triggered the geofence transition.
-                                String geofenceTransitionDetails = getGeofenceTransitionDetails(GeoFenceTransitionIntentService.this, geofenceTransitions, triggerdGeoFencesList);
-
+                                String geofenceTransitionDetails = getGeofenceTransitionDetails(GeoFenceTransitionIntentService.this, geofenceTransition, triggerdGeoFencesList);
                                 sendNotification(geofenceTransitionDetails);
-                                Log.d(TAG, geofenceTransitionDetails);
+
                                 Date date = new Date(System.currentTimeMillis());
                                 SimpleDateFormat format = new SimpleDateFormat("EEE, MMM d, ''yy , hh:mm:ss", Locale.ENGLISH);
                                 String st_date = format.format(date);
@@ -139,11 +147,13 @@ public class GeoFenceTransitionIntentService extends IntentService {
                                 firebaseDatabase.child("Kamran").push().setValue(value);
 
                             }
-                            isExit = true;
+                            editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, true);
+                            editor.commit();
                         }
+
+
                     }
                 }, 1000 * 2 * 60);
-
             }
         }
 

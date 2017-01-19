@@ -9,12 +9,14 @@ import java.util.HashMap;
  */
 
 public class Constants  {
+    public static final String PREFERNCES_KEY_FOR_EXIT = "isExit";
+
     private Constants() {
     }
     public static class SharedPrefs {
         public static String Geofences = "SHARED_PREFS_GEOFENCES";
     }
-    public static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
+    public static final String PACKAGE_NAME = "com.example.kamranali.geofencedummyproject";
 
     public static final String SHARED_PREFERENCES_NAME = PACKAGE_NAME + ".SHARED_PREFERENCES_NAME";
 
