@@ -48,10 +48,10 @@ public class Constants  {
 
         //HOTEL
         PanacloudLatLong.put("Hotel ", new LatLng(24.920905,66.992984));
-//        // OFFICE
+        // OFFICE
 //        PanacloudLatLong.put("MeatOne ", new LatLng(24.813602758751703, 67.04840116202831));
 //
-//        // OFFICE
+//         //OFFICE
 //        PanacloudLatLong.put("HOME ", new LatLng(24.882545824417782,67.05190446227789));
 //
 //        //HOTEL

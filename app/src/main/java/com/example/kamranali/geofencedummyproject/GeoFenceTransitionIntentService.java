@@ -44,6 +44,7 @@ public class GeoFenceTransitionIntentService extends IntentService {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     int geofenceTransition;
+    private Runnable run;
 
 
     @Override
@@ -82,6 +83,7 @@ public class GeoFenceTransitionIntentService extends IntentService {
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 sendNotification("Enter Detected");
                 if (!sharedPreferences.getBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false)) {
+
                     List<Geofence> triggerdGeoFencesList = geofencingEvent.getTriggeringGeofences();
                     //Getting the location that triggered the geofence transition.
                     String geofenceTransitionDetails = getGeofenceTransitionDetails(this, geofenceTransition, triggerdGeoFencesList);
@@ -100,9 +102,10 @@ public class GeoFenceTransitionIntentService extends IntentService {
                     value.put("trigered-Time", st_date);
                     value.put("server-Time", ServerValue.TIMESTAMP);
 
-                    firebaseDatabase.child("Kamran").push().setValue(value);
+                    firebaseDatabase.child("Zeeshan").push().setValue(value);
                     Log.d(TAG, geofenceTransitionDetails);
                 } else {
+                    handler.removeCallbacks(run);
                     editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false);
                     editor.commit();
 //                    isExit = false;
@@ -113,9 +116,7 @@ public class GeoFenceTransitionIntentService extends IntentService {
                 sendNotification("Exit Detected");
                 editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, true);
                 editor.commit();
-
-
-                handler.postDelayed(new Runnable() {
+                run = new Runnable() {
 
                     @Override
                     public void run() {
@@ -144,16 +145,24 @@ public class GeoFenceTransitionIntentService extends IntentService {
                                 value.put("trigered-Time", st_date);
                                 value.put("server-Time", ServerValue.TIMESTAMP);
 
-                                firebaseDatabase.child("Kamran").push().setValue(value);
+                                firebaseDatabase.child("Zeeshan").push().setValue(value);
+//                                sharedPreferences = getSharedPreferences(Constants.PREFERNCES_KEY_FOR_EXIT, Context.MODE_PRIVATE);
+//                                editor = sharedPreferences.edit();
+//                                editor.clear();
+                                editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false);
+                                editor.commit();
 
                             }
-                            editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, true);
+                            editor.putBoolean(Constants.PREFERNCES_KEY_FOR_EXIT, false);
                             editor.commit();
+
+
                         }
 
 
                     }
-                }, 1000 * 2 * 60);
+                };
+                handler.postDelayed(run, 1000 * 60);
             }
         }
 
